@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Form Tambah Pasien</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.1/css/dataTables.bootstrap4.min.css">
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.1/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.1/js/dataTables.bootstrap4.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Form Tambah Pasien</h1>
+        <button id="tambahButton" class="btn btn-primary">Tambah</button>
+
+        <div id="formContainer" style="display: none;">
+            <form id="formPasien">
+                <div class="form-group">
+                    <label for="nama">Nama:</label>
+                    <input type="text" class="form-control" id="nama" name="nama" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="alamat">Alamat:</label>
+                    <input type="text" class="form-control" id="alamat" name="alamat" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="nik">NIK:</label>
+                    <input type="text" class="form-control" id="nik" name="nik" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="jenis_kelamin">Jenis Kelamin:</label>
+                    <select class="form-control" id="jenis_kelamin" name="jenis_kelamin" required>
+                        <option value="">Pilih Jenis Kelamin</option>
+                        <option value="Laki-laki">Laki-laki</option>
+                        <option value="Perempuan">Perempuan</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="tanggal_lahir">Tanggal Lahir:</label>
+                    <input type="text" class="form-control" id="tanggal_lahir" name="tanggal_lahir" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="nomor_telepon">Nomor Telepon:</label>
+                    <input type="text" class="form-control" id="nomor_telepon" name="nomor_telepon" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Simpan</button>
+            </form>
+        </div>
+
+        <h1>Daftar Pasien</h1>
+        <table id="dataTable" class="table table-striped table-bordered" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Nama</th>
+                    <th>Alamat</th>
+                    <th>NIK</th>
+                    <th>Jenis Kelamin</th>
+                    <th>Tanggal Lahir</th>
+                    <th>Nomor Telepon</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Inisialisasi DataTables
+            var table = $('#dataTable').DataTable({
+                "lengthMenu": [5, 10, 25],
+                "pageLength": 5
+            });
+
+            // Fungsi untuk menambahkan data ke tabel
+            function addDataToTable(data) {
+                var rowNode = table.row.add([
+                    data.nama,
+                    data.alamat,
+                    data.nik,
+                    data.jenis_kelamin,
+                    data.tanggal_lahir,
+                    data.nomor_telepon,
+                    '<button class="edit btn btn-sm btn-primary">Edit</button> <button class="hapus btn btn-sm btn-danger">Hapus</button>'
+                ]).draw(false).node();
+
+                // Menambahkan data ID ke baris sebagai atribut data
+                $(rowNode).attr('data-id', data.id);
+            }
+
+            // Menghandle aksi klik pada tombol Edit
+            $('#dataTable tbody').on('click', '.edit', function() {
+                var row = $(this).closest('tr');
+                var id = $(row).attr('data-id');
+
+                // Ambil data pasien dari tabel berdasarkan ID
+                var data = table.row(row).data();
+
+                // Setel nilai input form sesuai dengan data pasien
+                $('#nama').val(data[0]);
+                $('#alamat').val(data[1]);
+                $('#nik').val(data[2]);
+                $('#jenis_kelamin').val(data[3]);
+                $('#tanggal_lahir').val(data[4]);
+                $('#nomor_telepon').val(data[5]);
+
+                // Tampilkan form
+                $('#formContainer').show();
+            });
+
+            // Menghandle aksi klik pada tombol Hapus
+            $('#dataTable tbody').on('click', '.hapus', function() {
+                var row = $(this).closest('tr');
+                var id = $(row).attr('data-id');
+
+                // Hapus baris dari tabel
+                table.row(row).remove().draw();
+            });
+
+            // Mengambil data JSON dari file data.json
+            $.getJSON('data.json', function(data) {
+                // Menambahkan setiap data ke tabel
+                $.each(data, function(key, value) {
+                    addDataToTable(value);
+                });
+            });
+
+            $('#tambahButton').click(function() {
+                // Reset form
+                $('#formPasien')[0].reset();
+
+                // Tampilkan form
+                $('#formContainer').show();
+            });
+
+            $('#tanggal_lahir').datepicker({
+                dateFormat: 'yy-mm-dd'
+            });
+
+            // Validasi form menggunakan jQuery Validation
+            $('#formPasien').validate({
+                rules: {
+                    nama: 'required',
+                    alamat: 'required',
+                    nik: 'required',
+                    jenis_kelamin: 'required',
+                    tanggal_lahir: 'required',
+                    nomor_telepon: 'required'
+                },
+                messages: {
+                    nama: 'Silakan masukkan nama',
+                    alamat: 'Silakan masukkan alamat',
+                    nik: 'Silakan masukkan NIK',
+                    jenis_kelamin: 'Silakan pilih jenis kelamin',
+                    tanggal_lahir: 'Silakan masukkan tanggal lahir',
+                    nomor_telepon: 'Silakan masukkan nomor telepon'
+                },
+                submitHandler: function(form) {
+                    // Ambil data dari form
+                    var nama = $('#nama').val();
+                    var alamat = $('#alamat').val();
+                    var nik = $('#nik').val();
+                    var jenis_kelamin = $('#jenis_kelamin').val();
+                    var tanggal_lahir = $('#tanggal_lahir').val();
+                    var nomor_telepon = $('#nomor_telepon').val();
+
+                    // Generate ID unik untuk data baru
+                    var id = Date.now();
+
+                    // Buat objek data pasien baru
+                    var newData = {
+                        id: id,
+                        nama: nama,
+                        alamat: alamat,
+                        nik: nik,
+                        jenis_kelamin: jenis_kelamin,
+                        tanggal_lahir: tanggal_lahir,
+                        nomor_telepon: nomor_telepon
+                    };
+
+                    // Tambahkan data baru ke tabel
+                    addDataToTable(newData);
+
+                    // Reset form
+                    form.reset();
+
+                    // Sembunyikan form
+                    $('#formContainer').hide();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

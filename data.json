@@ -1,0 +1,20 @@
+{
+  "pasien1": {
+    "id": 1,
+    "nama": "Andi Ramang",
+    "alamat": "Jalan Merdeka No. 123",
+    "nik": "1234567890",
+    "jenis_kelamin": "Laki-laki",
+    "tanggal_lahir": "1990-05-20",
+    "nomor_telepon": "081234567890"
+  },
+  "pasien2": {
+    "id": 2,
+    "nama": "Basuki",
+    "alamat": "Jalan Jenderal Sudirman No. 456",
+    "nik": "0987654321",
+    "jenis_kelamin": "Perempuan",
+    "tanggal_lahir": "1995-10-15",
+    "nomor_telepon": "081234567891"
+  }
+}
